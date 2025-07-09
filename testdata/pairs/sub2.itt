@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="es" xmlns="http://www.w3.org/ns/ttml" timeBase="smpte" frameRate="29.97">
+  <head>
+    <styling>
+      <style id="white" color="white" fontSize="100%" fontWeight="bold"/>
+      <style id="red" color="red"/>
+    </styling>
+    <layout>
+      <region id="top" origin="15% 10%" extent="70% 10%" textAlign="center" displayAlign="before" />
+      <region id="bottom" origin="15% 80%" extent="70% 10%" textAlign="center" displayAlign="after" />
+    </layout>
+  </head>
+  <body>
+    <div region="top">
+      <p begin="00:00:00:10" end="00:00:02:20" style="white">¡Hola!</p>
+      <p begin="00:00:03:00" end="00:00:05:00" style="red">¿Cómo estás?</p>
+    </div>
+    <div region="bottom">
+      <p begin="00:00:05:10" end="00:00:07:15" style="white">Estoy bien, gracias.</p>
+    </div>
+  </body>
+</tt> 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" ttp:timeBase="media" xml:lang="fr-FR">
+  <head>
+    <styling>
+      <style xml:id="default" tts:color="white" tts:fontSize="100%"></style>
+    </styling>
+    <layout>
+      <region xml:id="centre" origin="20% 70%" extent="60% 15%" displayAlign="after" textAlign="center"></region>
+    </layout>
+  </head>
+  <body>
+    <div>
+      <p begin="00:00:00.000" end="00:00:02.000" style="default" region="centre">Ceci est un test.</p>
+      <p begin="00:00:02.200" end="00:00:04.600" style="default" region="centre">Deuxième ligne,<br/>avec saut.</p>
+      <p begin="00:00:05.000" end="00:00:07.400" style="default" region="centre">Troisième ligne avec caractères spéciaux: éèàçô.</p>
+    </div>
+  </body>
+</tt>

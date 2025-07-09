@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="en-US" xmlns="http://www.w3.org/ns/ttml" timeBase="smpte" frameRate="24">
+  <head>
+    <styling>
+      <style id="s1" color="white" fontSize="100%"/>
+      <style id="s2" color="yellow" fontStyle="italic"/>
+    </styling>
+    <layout>
+      <region id="bottom" origin="10% 80%" extent="80% 10%" textAlign="center" displayAlign="after"/>
+    </layout>
+  </head>
+  <body region="bottom">
+    <div>
+      <p begin="00:00:01:00" end="00:00:03:12" style="s1">Hello, <span style="s2">World</span>!</p>
+      <p begin="00:00:04:00" end="00:00:06:12" style="s1">This is a second subtitle<br/>with line break.</p>
+      <p begin="00:00:07:00" end="00:00:09:12" style="s2" region="bottom">Third one with italic style.</p>
+      <p begin="00:00:10:15" end="00:00:12:00" style="s1">Fourth cue with partial frames.</p>
+    </div>
+  </body>
+</tt> 

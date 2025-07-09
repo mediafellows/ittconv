@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="fr-FR" xmlns="http://www.w3.org/ns/ttml" timeBase="smpte" frameRate="25">
+  <head>
+    <styling>
+      <style id="default" color="white" fontSize="100%" />
+    </styling>
+    <layout>
+      <region id="centre" origin="20% 70%" extent="60% 15%" textAlign="center" displayAlign="after"/>
+    </layout>
+  </head>
+  <body region="centre">
+    <div>
+      <p begin="00:00:00:00" end="00:00:02:00" style="default">Ceci est un test.</p>
+      <p begin="00:00:02:05" end="00:00:04:15" style="default">Deuxième ligne,<br/>avec saut.</p>
+      <p begin="00:00:05:00" end="00:00:07:10" style="default">Troisième ligne avec caractères spéciaux: éèàçô.</p>
+    </div>
+  </body>
+</tt> 

@@ -83,6 +83,8 @@ func TestParseSMPTETimecode(t *testing.T) {
 func TestToMilliseconds(t *testing.T) {
 	fr24, _ := NewFrameRate("24")
 	fr2997, _ := NewFrameRate("29.97")
+	fr25, _ := NewFrameRate("25")
+	fr30, _ := NewFrameRate("30")
 
 	tests := []struct {
 		name      string
@@ -96,6 +98,8 @@ func TestToMilliseconds(t *testing.T) {
 		{name: "00:00:00:12 @ 24fps", timecode: &SMPTETimecode{0, 0, 0, 12}, framerate: fr24, expected: big.NewRat(500, 1), expectErr: false},
 		{name: "00:00:01:12 @ 24fps", timecode: &SMPTETimecode{0, 0, 1, 12}, framerate: fr24, expected: big.NewRat(1500, 1), expectErr: false},
 		{name: "00:00:00:29 @ 29.97fps", timecode: &SMPTETimecode{0, 0, 0, 29}, framerate: fr2997, expected: big.NewRat(2900000, 2997), expectErr: false},
+		{name: "00:00:01:00 @ 25fps", timecode: &SMPTETimecode{0, 0, 1, 0}, framerate: fr25, expected: big.NewRat(1000, 1), expectErr: false},
+		{name: "00:00:00:15 @ 30fps", timecode: &SMPTETimecode{0, 0, 0, 15}, framerate: fr30, expected: big.NewRat(500, 1), expectErr: false},
 		{name: "Nil FrameRate", timecode: &SMPTETimecode{0, 0, 0, 0}, framerate: nil, expected: nil, expectErr: true},
 		{name: "Zero FrameRate", timecode: &SMPTETimecode{0, 0, 0, 0}, framerate: &FrameRate{big.NewRat(0, 1)}, expected: nil, expectErr: true},
 	}
@@ -166,6 +170,8 @@ func TestMillisecondsToSMPTETimecode(t *testing.T) {
 func TestToClockTime(t *testing.T) {
 	fr24, _ := NewFrameRate("24")
 	fr2997, _ := NewFrameRate("29.97")
+	fr25, _ := NewFrameRate("25")
+	fr30, _ := NewFrameRate("30")
 
 	tests := []struct {
 		name      string
@@ -181,6 +187,8 @@ func TestToClockTime(t *testing.T) {
 		{name: "00:00:01:12 @ 24fps, prec 3", timecode: &SMPTETimecode{0, 0, 1, 12}, framerate: fr24, precision: 3, expected: "00:00:01.500", expectErr: false},
 		{name: "00:00:00:29 @ 29.97fps, prec 3", timecode: &SMPTETimecode{0, 0, 0, 29}, framerate: fr2997, precision: 3, expected: "00:00:00.968", expectErr: false}, // 29 frames / 29.97 fps = 0.9676343 seconds -> 968ms
 		{name: "00:00:00:29 @ 29.97fps, prec 2", timecode: &SMPTETimecode{0, 0, 0, 29}, framerate: fr2997, precision: 2, expected: "00:00:00.97", expectErr: false},  // 968ms -> 970ms with prec 2
+		{name: "00:00:00:12 @ 25fps, prec 3", timecode: &SMPTETimecode{0, 0, 0, 12}, framerate: fr25, precision: 3, expected: "00:00:00.480", expectErr: false},
+		{name: "00:00:00:15 @ 30fps, prec 3", timecode: &SMPTETimecode{0, 0, 0, 15}, framerate: fr30, precision: 3, expected: "00:00:00.500", expectErr: false},
 		{name: "Nil FrameRate", timecode: &SMPTETimecode{0, 0, 0, 0}, framerate: nil, precision: 3, expected: "", expectErr: true},
 	}
 

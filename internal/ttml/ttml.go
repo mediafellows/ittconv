@@ -140,6 +140,11 @@ func ToTTML(doc *parser.ITTDocument) (string, error) {
 		return "", err
 	}
 
+	// Perform a lightweight validation to ensure we didn't generate malformed XML.
+	if err := ValidateTTML(buf.String()); err != nil {
+		return "", fmt.Errorf("generated TTML failed validation: %w", err)
+	}
+
 	return buf.String(), nil
 }
 
