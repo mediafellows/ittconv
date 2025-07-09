@@ -1,47 +1,51 @@
 package ttml
 
 import (
+	"io/ioutil"
 	"ittconv/internal/parser"
-	"math/big"
 	"strings"
 	"testing"
 )
 
 func TestToTTML(t *testing.T) {
-	doc := &parser.ITTDocument{
-		Lang: "en-US",
-		Styles: map[string]parser.Style{
-			"s1": {ID: "s1", Color: "red"},
-			"s2": {ID: "s2", FontStyle: "italic"},
-		},
-		Regions: map[string]parser.Region{
-			"r1": {ID: "r1", Origin: "10% 10%"},
-		},
-		Cues: []parser.Cue{
-			{
-				Begin:    big.NewRat(1000, 1),
-				End:      big.NewRat(2500, 1),
-				Content:  "Hello World!",
-				RegionID: "r1",
-				StyleIDs: []string{"s1", "s2"},
-			},
-		},
+	// First, parse the valid input fixture to get a document object.
+	ittSource, err := ioutil.ReadFile("../../testdata/valid_input.itt")
+	if err != nil {
+		t.Fatalf("Failed to read test fixture: %v", err)
+	}
+	doc, err := parser.ParseITT(string(ittSource))
+	if err != nil {
+		t.Fatalf("Failed to parse ITT for TTML test: %v", err)
 	}
 
-	expectedTTMLFragment := `<p begin="00:00:01.000" end="00:00:02.500" style="s1 s2" region="r1">Hello World!</p>`
-
-	ttml, err := ToTTML(doc)
+	// Now, convert the parsed document to TTML.
+	ttmlOutput, err := ToTTML(doc)
 	if err != nil {
 		t.Fatalf("ToTTML failed: %v", err)
 	}
 
-	if !strings.Contains(ttml, expectedTTMLFragment) {
-		t.Errorf("Expected TTML to contain fragment:\n%s\n\nGot TTML:\n%s", expectedTTMLFragment, ttml)
+	// Check for expected TTML content.
+	// 1. Check for correct time format conversion (first cue).
+	//    00:00:03:12 @ 24fps = 3 + 12/24 = 3.5s = 3.500
+	if !strings.Contains(ttmlOutput, `begin="00:00:01.000" end="00:00:03.500"`) {
+		t.Errorf("Expected correct time conversion. Looked for `begin=\"00:00:01.000\" end=\"00:00:03.500\"`.\nGot:\n%s", ttmlOutput)
 	}
 
-	// Also check for a style definition
-	expectedStyleFragment := `<style xml:id="s1" tts:color="red"></style>`
-	if !strings.Contains(ttml, expectedStyleFragment) {
-		t.Errorf("Expected TTML to contain style fragment:\n%s\n\nGot TTML:\n%s", expectedStyleFragment, ttml)
+	// 2. Check for preserved content with inline styles.
+	if !strings.Contains(ttmlOutput, `<span style="s1">second</span>`) {
+		t.Errorf("Expected inline span with style. Looked for `<span style=\"s1\">second</span>`.\nGot:\n%s", ttmlOutput)
+	}
+
+	// 3. Check for preserved line breaks.
+	if !strings.Contains(ttmlOutput, "A third one<br/>with a line break.") {
+		t.Errorf("Expected preserved line break. Looked for `A third one<br/>with a line break.`.\nGot:\n%s", ttmlOutput)
+	}
+
+	// 4. Check for correct XML header and root element.
+	if !strings.HasPrefix(ttmlOutput, `<?xml version="1.0" encoding="UTF-8"?>`) {
+		t.Error("Expected XML header prefix.")
+	}
+	if !strings.Contains(ttmlOutput, `<tt xmlns="http://www.w3.org/ns/ttml"`) {
+		t.Error("Expected tt root element with ttml namespace.")
 	}
 }

@@ -1,0 +1,27 @@
+<tt xmlns="http://www.w3.org/ns/ttml"
+    xmlns:ttp="http://www.w3.org/ns/ttml#parameter"
+    xmlns:tts="http://www.w3.org/ns/ttml#styling"
+    xml:lang="en-US"
+    ttp:timeBase="smpte"
+    ttp:frameRate="24">
+  <head>
+    <styling>
+      <style xml:id="s1" tts:color="white" tts:fontWeight="bold"/>
+      <style xml:id="s2" tts:fontFamily="sansSerif" tts:fontSize="100%"/>
+    </styling>
+    <layout>
+      <region xml:id="r1" tts:origin="10% 80%" tts:extent="80% 20%" tts:textAlign="center"/>
+    </layout>
+  </head>
+  <body region="r1">
+    <div>
+      <p begin="00:00:01:00" end="00:00:03:12" style="s2">
+        This is the first subtitle.
+      </p>
+      <p begin="00:00:04:00" end="00:00:05:00" style="s2">
+        This is the <span style="s1">second</span> one.
+      </p>
+      <p begin="00:00:06:00" end="00:00:07:00">A third one<br/>with a line break.</p>
+    </div>
+  </body>
+</tt> 
