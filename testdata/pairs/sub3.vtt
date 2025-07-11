@@ -1,0 +1,16 @@
+WEBVTT
+
+Region: id=centre lines=3 regionanchor=0%,0% scroll=up viewportanchor=20%,70% width=60%
+
+1
+00:00:00.000 --> 00:00:02.000 region:centre
+Ceci est un test.
+
+2
+00:00:02.200 --> 00:00:04.600 region:centre
+Deuxième ligne,
+avec saut.
+
+3
+00:00:05.000 --> 00:00:07.400 region:centre
+Troisième ligne avec caractères spéciaux: éèàçô.

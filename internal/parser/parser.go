@@ -140,9 +140,6 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 			buf.WriteString(`="`)
 			buf.WriteString(attr.Value)
 			buf.WriteByte('"')
-			if name.Local == "span" && attr.Name.Local == "style" {
-				h.currentCue.StyleIDs = append(h.currentCue.StyleIDs, strings.Fields(attr.Value)...)
-			}
 		}
 
 		// Handle self-closing tags like <br/>

@@ -39,9 +39,13 @@ func TestParseITT_Valid(t *testing.T) {
 	if !strings.Contains(cue.Content, "second") {
 		t.Errorf("Expected second cue content to be correct, got '%s'", cue.Content)
 	}
-	if len(cue.StyleIDs) != 2 { // s2 from <p>, s1 from <span>
-		t.Errorf("Expected 2 style IDs, got %v", cue.StyleIDs)
+	if len(cue.StyleIDs) != 1 {
+		t.Fatalf("Expected 1 style ID for the cue, got %d", len(cue.StyleIDs))
 	}
+	if cue.StyleIDs[0] != "s2" {
+		t.Errorf("Expected style ID 's2' for the cue, got '%s'", cue.StyleIDs[0])
+	}
+
 	fr, _ := timecode.NewFrameRate("24")
 	expectedBegin, _ := timecode.ParseSMPTETimecode("00:00:04:00")
 	expectedBeginMs, _ := expectedBegin.ToMilliseconds(fr)

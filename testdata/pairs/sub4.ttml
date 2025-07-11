@@ -2,15 +2,15 @@
 <tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" ttp:timeBase="media" xml:lang="en">
   <head>
     <styling>
-      <style xml:id="white" tts:color="white"></style>
-      <style xml:id="red" tts:color="red"></style>
-      <style xml:id="yellow" tts:color="yellow"></style>
       <style xml:id="blue" tts:color="blue"></style>
+      <style xml:id="red" tts:color="red"></style>
+      <style xml:id="white" tts:color="white"></style>
+      <style xml:id="yellow" tts:color="yellow"></style>
     </styling>
     <layout>
+      <region xml:id="bottom" origin="10% 80%" extent="80% 10%" displayAlign="after" textAlign="center"></region>
       <region xml:id="left" origin="5% 40%" extent="40% 10%" displayAlign="center" textAlign="start"></region>
       <region xml:id="right" origin="55% 40%" extent="40% 10%" displayAlign="center" textAlign="end"></region>
-      <region xml:id="bottom" origin="10% 80%" extent="80% 10%" displayAlign="after" textAlign="center"></region>
       <region xml:id="top" origin="10% 10%" extent="80% 10%" displayAlign="before" textAlign="center"></region>
     </layout>
   </head>

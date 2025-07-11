@@ -2,12 +2,12 @@
 <tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" ttp:timeBase="media" xml:lang="es">
   <head>
     <styling>
-      <style xml:id="white" tts:color="white" tts:fontSize="100%" tts:fontWeight="bold"></style>
       <style xml:id="red" tts:color="red"></style>
+      <style xml:id="white" tts:color="white" tts:fontSize="100%" tts:fontWeight="bold"></style>
     </styling>
     <layout>
-      <region xml:id="top" origin="15% 10%" extent="70% 10%" displayAlign="before" textAlign="center"></region>
       <region xml:id="bottom" origin="15% 80%" extent="70% 10%" displayAlign="after" textAlign="center"></region>
+      <region xml:id="top" origin="15% 10%" extent="70% 10%" displayAlign="before" textAlign="center"></region>
     </layout>
   </head>
   <body>

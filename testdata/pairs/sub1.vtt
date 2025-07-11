@@ -1,0 +1,20 @@
+WEBVTT
+
+Region: id=bottom lines=2 regionanchor=0%,0% scroll=up viewportanchor=10%,80% width=80%
+
+1
+00:00:01.000 --> 00:00:03.500 region:bottom
+Hello, World!
+
+2
+00:00:04.000 --> 00:00:06.500 region:bottom
+This is a second subtitle
+with line break.
+
+3
+00:00:07.000 --> 00:00:09.500 region:bottom
+Third one with italic style.
+
+4
+00:00:10.625 --> 00:00:12.000 region:bottom
+Fourth cue with partial frames.

@@ -1,59 +1,42 @@
 package vtt
 
 import (
-	"fmt"
+	"bytes"
 	"ittconv/internal/parser"
-	"math/big"
+	"ittconv/internal/ttml"
 	"sort"
 	"strings"
+
+	"github.com/asticode/go-astisub"
 )
 
 // ToVTT converts an ITTDocument to a VTT formatted string.
+// It does so by first converting the document to a temporary TTML string,
+// and then uses the go-astisub library to perform a high-fidelity
+// conversion from TTML to VTT, preserving styling and region information.
 func ToVTT(doc *parser.ITTDocument) (string, error) {
-	var sb strings.Builder
+	// Step 1: Convert our internal ITTDocument to a TTML string.
+	ttmlString, err := ttml.ToTTML(doc)
+	if err != nil {
+		return "", err
+	}
 
-	sb.WriteString("WEBVTT\n\n")
+	// Step 2: Use astisub to read the TTML from a string reader.
+	subs, err := astisub.ReadFromTTML(strings.NewReader(ttmlString))
+	if err != nil {
+		return "", err
+	}
 
-	// Sort cues by begin time
-	sort.Slice(doc.Cues, func(i, j int) bool {
-		return doc.Cues[i].Begin.Cmp(doc.Cues[j].Begin) < 0
+	// Sort cues by timestamp to ensure deterministic output.
+	sort.Slice(subs.Items, func(i, j int) bool {
+		return subs.Items[i].StartAt < subs.Items[j].StartAt
 	})
 
-	for _, cue := range doc.Cues {
-		beginStr, err := formatVTTTimestamp(cue.Begin)
-		if err != nil {
-			return "", fmt.Errorf("error formatting begin timestamp for cue %s: %w", cue.ID, err)
-		}
-		endStr, err := formatVTTTimestamp(cue.End)
-		if err != nil {
-			return "", fmt.Errorf("error formatting end timestamp for cue %s: %w", cue.ID, err)
-		}
-
-		sb.WriteString(fmt.Sprintf("%s --> %s\n", beginStr, endStr))
-		sb.WriteString(cue.Content)
-		sb.WriteString("\n\n")
+	// Step 3: Write the subtitles to a WebVTT format in a buffer.
+	var buf bytes.Buffer
+	if err := subs.WriteToWebVTT(&buf); err != nil {
+		return "", err
 	}
 
-	return sb.String(), nil
-}
-
-// formatVTTTimestamp converts a big.Rat (in milliseconds) to a VTT timestamp string (HH:MM:SS.mmm).
-func formatVTTTimestamp(ms *big.Rat) (string, error) {
-	if ms == nil {
-		return "00:00:00.000", nil
-	}
-
-	// To convert a rational number a/b to an integer, we can compute (a * 1000) / b
-	// and then take the integer part. However, we are dealing with milliseconds, so we
-	// can just compute a/b.
-	msInt := new(big.Int).Quo(ms.Num(), ms.Denom()).Int64()
-
-	hours := msInt / 3600000
-	msInt %= 3600000
-	minutes := msInt / 60000
-	msInt %= 60000
-	seconds := msInt / 1000
-	milliseconds := msInt % 1000
-
-	return fmt.Sprintf("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds), nil
+	return buf.String(), nil
 }

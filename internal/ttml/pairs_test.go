@@ -1,4 +1,4 @@
-package ttml
+package ttml_test
 
 import (
 	"io/ioutil"
@@ -7,12 +7,14 @@ import (
 	"testing"
 
 	"ittconv/internal/parser"
+	"ittconv/internal/ttml"
+	"ittconv/internal/vtt"
 
 	"github.com/google/go-cmp/cmp"
 )
 
-// TestSubtitlePairs iterates through every *.itt / *.ttml pair found in
-// testdata/pairs/ and ensures the converter produces exactly the expected
+// TestSubtitlePairs iterates through every *.itt pair found in testdata/pairs/
+// and ensures the converter produces matching TTML *and* VTT outputs.
 // output. When a mismatch occurs, a unified diff is printed to help narrow
 // down the problem area.
 func TestSubtitlePairs(t *testing.T) {
@@ -29,16 +31,22 @@ func TestSubtitlePairs(t *testing.T) {
 
 	for _, ittPath := range ittFiles {
 		base := strings.TrimSuffix(filepath.Base(ittPath), filepath.Ext(ittPath))
-		wantPath := filepath.Join(pairsDir, base+".ttml")
+		wantTTML := filepath.Join(pairsDir, base+".ttml")
+		wantVTT := filepath.Join(pairsDir, base+".vtt")
 
 		ittData, err := ioutil.ReadFile(ittPath)
 		if err != nil {
 			t.Fatalf("failed to read %s: %v", ittPath, err)
 		}
 
-		wantData, err := ioutil.ReadFile(wantPath)
+		wantTTMLData, err := ioutil.ReadFile(wantTTML)
 		if err != nil {
 			t.Fatalf("missing matching .ttml file for %s: %v", ittPath, err)
+		}
+
+		wantVTTData, err := ioutil.ReadFile(wantVTT)
+		if err != nil {
+			t.Fatalf("missing matching .vtt file for %s: %v", ittPath, err)
 		}
 
 		doc, err := parser.ParseITT(string(ittData))
@@ -46,14 +54,23 @@ func TestSubtitlePairs(t *testing.T) {
 			t.Fatalf("failed to parse %s: %v", ittPath, err)
 		}
 
-		got, err := ToTTML(doc)
+		gotTTML, err := ttml.ToTTML(doc)
 		if err != nil {
 			t.Fatalf("failed to convert %s: %v", ittPath, err)
 		}
 
 		// Direct comparison – indentation and attribute ordering must match.
-		if diff := cmp.Diff(string(wantData), got); diff != "" {
-			t.Errorf("conversion mismatch for %s (-want +got):\n%s", filepath.Base(ittPath), diff)
+		if diff := cmp.Diff(string(wantTTMLData), gotTTML); diff != "" {
+			t.Errorf("TTML mismatch for %s (-want +got):\n%s", filepath.Base(ittPath), diff)
+		}
+
+		// Now VTT
+		gotVTT, err := vtt.ToVTT(doc)
+		if err != nil {
+			t.Fatalf("failed to convert %s to VTT: %v", ittPath, err)
+		}
+		if diff := cmp.Diff(string(wantVTTData), gotVTT); diff != "" {
+			t.Errorf("VTT mismatch for %s (-want +got):\n%s", filepath.Base(ittPath), diff)
 		}
 	}
 }

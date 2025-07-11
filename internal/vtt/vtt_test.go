@@ -4,6 +4,8 @@ import (
 	"ittconv/internal/parser"
 	"math/big"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestToVTT(t *testing.T) {
@@ -13,7 +15,7 @@ func TestToVTT(t *testing.T) {
 				ID:      "cue2",
 				Begin:   big.NewRat(3000, 1), // 3000ms
 				End:     big.NewRat(4000, 1), // 4000ms
-				Content: "Line\nBreak",
+				Content: "Line<br/>Break",
 			},
 			{
 				ID:      "cue1",
@@ -26,13 +28,14 @@ func TestToVTT(t *testing.T) {
 
 	expectedVTT := `WEBVTT
 
+1
 00:00:01.000 --> 00:00:02.500
 Hello World!
 
+2
 00:00:03.000 --> 00:00:04.000
 Line
 Break
-
 `
 
 	vtt, err := ToVTT(doc)
@@ -40,7 +43,7 @@ Break
 		t.Fatalf("ToVTT failed: %v", err)
 	}
 
-	if vtt != expectedVTT {
-		t.Errorf("Expected VTT output does not match.\nExpected:\n%s\nGot:\n%s", expectedVTT, vtt)
+	if diff := cmp.Diff(expectedVTT, vtt); diff != "" {
+		t.Errorf("VTT output mismatch (-want +got):\n%s", diff)
 	}
 }

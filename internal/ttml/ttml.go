@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"ittconv/internal/parser"
 	"math/big"
+	"sort"
 	"strings"
 )
 
@@ -87,8 +88,14 @@ func ToTTML(doc *parser.ITTDocument) (string, error) {
 		Lang:     doc.Lang,
 	}
 
-	// Styles
-	for _, style := range doc.Styles {
+	// Styles (deterministic order by ID)
+	var styleIDs []string
+	for id := range doc.Styles {
+		styleIDs = append(styleIDs, id)
+	}
+	sort.Strings(styleIDs)
+	for _, id := range styleIDs {
+		style := doc.Styles[id]
 		outputDoc.Head.Styling.Styles = append(outputDoc.Head.Styling.Styles, ttStyle{
 			ID:         style.ID,
 			Color:      style.Color,
@@ -99,8 +106,14 @@ func ToTTML(doc *parser.ITTDocument) (string, error) {
 		})
 	}
 
-	// Regions
-	for _, region := range doc.Regions {
+	// Regions (deterministic order by ID)
+	var regionIDs []string
+	for id := range doc.Regions {
+		regionIDs = append(regionIDs, id)
+	}
+	sort.Strings(regionIDs)
+	for _, id := range regionIDs {
+		region := doc.Regions[id]
 		outputDoc.Head.Layout.Regions = append(outputDoc.Head.Layout.Regions, ttRegion{
 			ID:           region.ID,
 			Origin:       region.Origin,
