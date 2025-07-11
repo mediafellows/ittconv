@@ -1,8 +1,9 @@
 package parser
 
 import (
-	"ittconv/internal/timecode"
 	"math/big"
+
+	"github.com/mediafellows/ittconv/internal/timecode"
 )
 
 // ITTDocument represents the root of an iTunes Timed Text file.

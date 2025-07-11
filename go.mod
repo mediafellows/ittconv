@@ -1,4 +1,4 @@
-module ittconv
+module github.com/mediafellows/ittconv
 
 go 1.22.2
 

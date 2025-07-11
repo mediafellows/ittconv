@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"ittconv/internal/parser"
 	"math/big"
 	"sort"
 	"strings"
+
+	"github.com/mediafellows/ittconv/internal/parser"
 )
 
 // ToTTML converts an ITTDocument to a standard TTML formatted string.

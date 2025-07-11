@@ -2,10 +2,11 @@ package vtt
 
 import (
 	"bytes"
-	"ittconv/internal/parser"
-	"ittconv/internal/ttml"
 	"sort"
 	"strings"
+
+	"github.com/mediafellows/ittconv/internal/parser"
+	"github.com/mediafellows/ittconv/internal/ttml"
 
 	"github.com/asticode/go-astisub"
 )

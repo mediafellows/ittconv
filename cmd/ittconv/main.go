@@ -5,9 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"ittconv/internal/parser"
-	"ittconv/internal/ttml"
-	"ittconv/internal/vtt"
+	"github.com/mediafellows/ittconv"
 
 	"github.com/alecthomas/kong"
 )
@@ -27,19 +25,13 @@ func main() {
 		ctx.Fatalf("Failed to read input file: %v", err)
 	}
 
-	// Parse the ITT data
-	doc, err := parser.ParseITT(string(inputData))
-	if err != nil {
-		ctx.Fatalf("Failed to parse ITT file: %v", err)
-	}
-
 	// Convert to the target format
 	var output string
 	switch CLI.Format {
 	case "vtt":
-		output, err = vtt.ToVTT(doc)
+		output, err = ittconv.ToVTT(string(inputData))
 	case "ttml":
-		output, err = ttml.ToTTML(doc)
+		output, err = ittconv.ToTTML(string(inputData))
 	default:
 		ctx.Fatalf("Unsupported format: %s. Please use 'vtt' or 'ttml'.", CLI.Format)
 	}

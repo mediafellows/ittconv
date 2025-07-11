@@ -1,9 +1,10 @@
 package vtt
 
 import (
-	"ittconv/internal/parser"
 	"math/big"
 	"testing"
+
+	"github.com/mediafellows/ittconv/internal/parser"
 
 	"github.com/google/go-cmp/cmp"
 )

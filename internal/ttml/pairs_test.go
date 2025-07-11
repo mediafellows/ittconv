@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"ittconv/internal/parser"
-	"ittconv/internal/ttml"
-	"ittconv/internal/vtt"
+	"github.com/mediafellows/ittconv/internal/parser"
+	"github.com/mediafellows/ittconv/internal/ttml"
+	"github.com/mediafellows/ittconv/internal/vtt"
 
 	"github.com/google/go-cmp/cmp"
 )

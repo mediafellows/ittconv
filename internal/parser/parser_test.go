@@ -2,9 +2,10 @@ package parser
 
 import (
 	"io/ioutil"
-	"ittconv/internal/timecode"
 	"strings"
 	"testing"
+
+	"github.com/mediafellows/ittconv/internal/timecode"
 )
 
 func TestParseITT_Valid(t *testing.T) {

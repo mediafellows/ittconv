@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"ittconv/internal/timecode"
+	"github.com/mediafellows/ittconv/internal/timecode"
 
 	"github.com/orisano/gosax"
 )

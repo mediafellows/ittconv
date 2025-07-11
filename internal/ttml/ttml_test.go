@@ -2,9 +2,10 @@ package ttml
 
 import (
 	"io/ioutil"
-	"ittconv/internal/parser"
 	"strings"
 	"testing"
+
+	"github.com/mediafellows/ittconv/internal/parser"
 )
 
 func TestToTTML(t *testing.T) {

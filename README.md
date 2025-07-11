@@ -97,21 +97,21 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"ittconv/internal/ttml"
-	"ittconv/internal/vtt"
+
+	"github.com/mediafellows/ittconv"
 )
 
 func main() {
 	// Example for TTML conversion
 	ittSource := `<itt>...</itt>` // Your .itt XML content
-	ttmlOutput, err := ttml.ConvertToTTML(ittSource, "24")
+	ttmlOutput, err := ittconv.ToTTML(ittSource)
 	if err != nil {
 		log.Fatalf("Error converting to TTML: %v", err)
 	}
 	fmt.Println("TTML Output:\n", ttmlOutput)
 
 	// Example for WebVTT conversion
-	vttOutput, err := vtt.ConvertToVTT(ittSource, "23.976")
+	vttOutput, err := ittconv.ToVTT(ittSource)
 	if err != nil {
 		log.Fatalf("Error converting to WebVTT: %v", err)
 	}
