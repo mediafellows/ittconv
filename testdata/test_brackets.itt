@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="en-US"
+    xmlns="http://www.w3.org/ns/ttml"
+    xmlns:tts="http://www.w3.org/ns/ttml#styling"
+    xmlns:ttp="http://www.w3.org/ns/ttml#parameter"
+    ttp:frameRate="30"
+    ttp:timeBase="media">
+  <head>
+    <styling>
+      <style xml:id="style.default" tts:fontFamily="sansSerif" tts:fontSize="100%" tts:color="white" />
+    </styling>
+    <layout>
+      <region xml:id="bottom" tts:origin="0% 80%" tts:extent="100% 20%" tts:textAlign="center" />
+    </layout>
+  </head>
+  <body region="bottom" style="style.default">
+    <div>
+      <p begin="00:00:01;00" end="00:00:03;00">&lt;FLASH SALE&gt; hits 80%!</p>
+      <p begin="00:00:04;00" end="00:00:06;10">Tags like &lt;promo&gt; were breaking before.</p>
+    </div>
+  </body>
+</tt>

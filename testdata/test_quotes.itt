@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="en-US"
+    xmlns="http://www.w3.org/ns/ttml"
+    xmlns:tts="http://www.w3.org/ns/ttml#styling"
+    xmlns:ttp="http://www.w3.org/ns/ttml#parameter"
+    ttp:frameRate="25"
+    ttp:timeBase="media">
+  <head>
+    <styling>
+      <style xml:id="style.default" tts:fontFamily="sansSerif" tts:fontSize="85%" tts:color="white" />
+    </styling>
+    <layout>
+      <region xml:id="bottom" tts:origin="0% 70%" tts:extent="100% 30%" tts:textAlign="center" />
+    </layout>
+  </head>
+  <body region="bottom" style="style.default">
+    <div>
+      <p begin="00:00:02;00" end="00:00:04;00">She whispered &quot;run&quot; &#38; vanished.</p>
+      <p begin="00:00:04;10" end="00:00:06;15">Unicode &#169; and &#x2014; should survive.</p>
+    </div>
+  </body>
+</tt>

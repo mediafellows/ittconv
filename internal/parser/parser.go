@@ -331,7 +331,9 @@ func (h *ittHandler) handleEndElement(name xml.Name) error {
 
 func (h *ittHandler) handleCharData(c xml.CharData) error {
 	if h.inPElement || h.inSpanElement {
-		h.contentBuffer.Write(c)
+		if err := xml.EscapeText(&h.contentBuffer, c); err != nil {
+			return err
+		}
 	}
 	return nil
 }

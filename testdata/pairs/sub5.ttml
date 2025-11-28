@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" ttp:timeBase="media" xml:lang="en-US">
+  <head>
+    <styling>
+      <style xml:id="style.default" tts:color="white" tts:fontFamily="sansSerif" tts:fontSize="100%"></style>
+      <style xml:id="style.em" tts:fontStyle="italic"></style>
+    </styling>
+    <layout>
+      <region xml:id="bottom" origin="0% 85%" extent="100% 15%" textAlign="center"></region>
+    </layout>
+  </head>
+  <body>
+    <div>
+      <p begin="00:00:01.000" end="00:00:03.400" region="bottom">&lt;ALERT&gt; System rebooting.</p>
+      <p begin="00:00:03.500" end="00:00:05.667" region="bottom">AT&amp;T &amp; Friends on-stage.</p>
+      <p begin="00:00:05.734" end="00:00:07.333" region="bottom">She whispered &#34;run&#34; &amp; vanished.</p>
+      <p begin="00:00:07.400" end="00:00:09.166" style="style.em" region="bottom">Unicode © and — stay intact.</p>
+    </div>
+  </body>
+</tt>

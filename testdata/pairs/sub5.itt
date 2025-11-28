@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xml:lang="en-US"
+    xmlns="http://www.w3.org/ns/ttml"
+    xmlns:tts="http://www.w3.org/ns/ttml#styling"
+    xmlns:ttp="http://www.w3.org/ns/ttml#parameter"
+    ttp:frameRate="29.97"
+    ttp:frameRateMultiplier="1000 1001"
+    ttp:timeBase="smpte">
+  <head>
+    <styling>
+      <style xml:id="style.default" tts:fontFamily="sansSerif" tts:fontSize="100%" tts:color="white" />
+      <style xml:id="style.em" tts:fontStyle="italic" />
+    </styling>
+    <layout>
+      <region xml:id="bottom" tts:origin="0% 85%" tts:extent="100% 15%" tts:textAlign="center" />
+    </layout>
+  </head>
+  <body region="bottom" style="style.default">
+    <div>
+      <p begin="00:00:01;00" end="00:00:03;12">&lt;ALERT&gt; System rebooting.</p>
+      <p begin="00:00:03;15" end="00:00:05;20">AT&amp;T &amp; Friends on-stage.</p>
+      <p begin="00:00:05;22" end="00:00:07;10">She whispered &quot;run&quot; &amp; vanished.</p>
+      <p begin="00:00:07;12" end="00:00:09;05" style="style.em">Unicode &#169; and &#x2014; stay intact.</p>
+    </div>
+  </body>
+</tt>

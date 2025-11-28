@@ -54,7 +54,10 @@ type SMPTETimecode struct {
 
 // ParseSMPTETimecode parses a string like "HH:MM:SS:FF" into a SMPTETimecode.
 func ParseSMPTETimecode(s string) (*SMPTETimecode, error) {
-	parts := strings.Split(s, ":")
+	// Drop-frame timecodes often use ';' between seconds and frames.
+	// Normalize them to ':' so they can be parsed alongside standard SMPTE.
+	normalized := strings.ReplaceAll(s, ";", ":")
+	parts := strings.Split(normalized, ":")
 	if len(parts) != 4 {
 		return nil, fmt.Errorf("invalid SMPTE timecode format: %s, expected HH:MM:SS:FF", s)
 	}
