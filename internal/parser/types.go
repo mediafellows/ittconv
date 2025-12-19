@@ -8,12 +8,15 @@ import (
 
 // ITTDocument represents the root of an iTunes Timed Text file.
 type ITTDocument struct {
-	Lang      string
-	TimeBase  string
-	FrameRate string
-	Styles    map[string]Style
-	Regions   map[string]Region
-	Cues      []Cue
+	Lang                   string
+	TimeBase               string
+	FrameRate              string
+	FrameRateMultiplierNum int
+	FrameRateMultiplierDen int
+	FrameRateValue         *timecode.FrameRate
+	Styles                 map[string]Style
+	Regions                map[string]Region
+	Cues                   []Cue
 }
 
 // Style represents a TTML style definition.
@@ -43,6 +46,7 @@ type Cue struct {
 	End           *big.Rat
 	BeginTimecode *timecode.SMPTETimecode // Temporary storage for SMPTE timecode
 	EndTimecode   *timecode.SMPTETimecode // Temporary storage for SMPTE timecode
+	Offset        *big.Rat
 	RegionID      string
 	StyleIDs      []string
 	Content       string

@@ -5,7 +5,9 @@ import (
 	"encoding/xml"
 	"fmt"
 	"log/slog"
+	"math/big"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/mediafellows/ittconv/internal/timecode"
@@ -81,9 +83,23 @@ func ParseITT(ittSource string) (*ITTDocument, error) {
 	if doc.FrameRate == "" {
 		return nil, fmt.Errorf("frameRate attribute missing in <tt> tag")
 	}
-	fr, err := timecode.NewFrameRate(doc.FrameRate)
-	if err != nil {
-		return nil, fmt.Errorf("invalid frame rate '%s': %w", doc.FrameRate, err)
+	fr := doc.FrameRateValue
+	if fr == nil {
+		baseFrameRate, err := timecode.NewFrameRate(doc.FrameRate)
+		if err != nil {
+			return nil, fmt.Errorf("invalid frame rate '%s': %w", doc.FrameRate, err)
+		}
+		if doc.FrameRateMultiplierNum > 0 && doc.FrameRateMultiplierDen > 0 {
+			if baseFrameRate.IsInt() {
+				baseFrameRate = &timecode.FrameRate{
+					Rat: new(big.Rat).Mul(baseFrameRate.Rat, big.NewRat(int64(doc.FrameRateMultiplierNum), int64(doc.FrameRateMultiplierDen))),
+				}
+			} else {
+				logger.Debug("Skipping frameRateMultiplier because base frameRate is non-integer", "frameRate", doc.FrameRate)
+			}
+		}
+		fr = baseFrameRate
+		doc.FrameRateValue = fr
 	}
 	logger.Debug("Successfully parsed framerate", "framerate", doc.FrameRate)
 
@@ -106,6 +122,24 @@ func ParseITT(ittSource string) (*ITTDocument, error) {
 			logger.Debug("Converted end timecode", "smpte", cue.EndTimecode, "ms", ms)
 		}
 
+		if cue.Offset != nil {
+			if cue.Begin != nil {
+				cue.Begin = new(big.Rat).Add(cue.Begin, cue.Offset)
+			}
+			if cue.End != nil {
+				cue.End = new(big.Rat).Add(cue.End, cue.Offset)
+			}
+		}
+
+		if cue.Begin != nil && cue.Begin.Sign() < 0 {
+			logger.Warn("Clamping negative cue begin", "id", cue.ID, "value", cue.Begin.String())
+			cue.Begin = big.NewRat(0, 1)
+		}
+		if cue.End != nil && cue.End.Sign() < 0 {
+			logger.Warn("Clamping negative cue end", "id", cue.ID, "value", cue.End.String())
+			cue.End = big.NewRat(0, 1)
+		}
+
 		// Validate begin < end
 		if cue.Begin != nil && cue.End != nil && cue.Begin.Cmp(cue.End) >= 0 {
 			return nil, fmt.Errorf("invalid cue timing: begin time (%s) is not less than end time (%s) for cue ID %s",
@@ -126,6 +160,8 @@ type ittHandler struct {
 	inSpanElement bool
 	regionStack   []string
 	reader        *gosax.Reader
+	offsetStack   []*big.Rat
+	frameRate     *timecode.FrameRate
 }
 
 func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
@@ -156,6 +192,7 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 
 	switch name.Local {
 	case "tt":
+		var frameRateMultiplier string
 		for _, attr := range attrs {
 			switch attr.Name.Local {
 			case "lang":
@@ -167,16 +204,65 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 			case "frameRate":
 				h.doc.FrameRate = attr.Value
 				logger.Debug("Parsed frameRate", "value", attr.Value)
+			case "frameRateMultiplier":
+				frameRateMultiplier = attr.Value
+				logger.Debug("Parsed frameRateMultiplier", "value", attr.Value)
 			}
+		}
+
+		if frameRateMultiplier != "" {
+			parts := strings.Fields(frameRateMultiplier)
+			if len(parts) != 2 {
+				return fmt.Errorf("invalid frameRateMultiplier format: %s", frameRateMultiplier)
+			}
+			num, err := strconv.Atoi(parts[0])
+			if err != nil {
+				return fmt.Errorf("invalid frameRateMultiplier numerator %q: %w", parts[0], err)
+			}
+			den, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return fmt.Errorf("invalid frameRateMultiplier denominator %q: %w", parts[1], err)
+			}
+			if num <= 0 || den <= 0 {
+				return fmt.Errorf("frameRateMultiplier values must be positive: %s", frameRateMultiplier)
+			}
+			h.doc.FrameRateMultiplierNum = num
+			h.doc.FrameRateMultiplierDen = den
+		}
+
+		if h.doc.FrameRate != "" {
+			fr, err := timecode.NewFrameRate(h.doc.FrameRate)
+			if err != nil {
+				return fmt.Errorf("invalid frame rate '%s': %w", h.doc.FrameRate, err)
+			}
+			if h.doc.FrameRateMultiplierNum > 0 && h.doc.FrameRateMultiplierDen > 0 {
+				if fr.IsInt() {
+					fr = &timecode.FrameRate{
+						Rat: new(big.Rat).Mul(fr.Rat, big.NewRat(int64(h.doc.FrameRateMultiplierNum), int64(h.doc.FrameRateMultiplierDen))),
+					}
+				} else {
+					logger.Debug("Skipping frameRateMultiplier because base frameRate is non-integer", "frameRate", h.doc.FrameRate)
+				}
+			}
+			h.frameRate = fr
+			h.doc.FrameRateValue = fr
+			logger.Debug("Computed effective framerate", "value", fr.String())
 		}
 	case "body", "div":
 		regionFromAttr := ""
+		var beginAttr string
 		for _, attr := range attrs {
 			if attr.Name.Local == "region" {
 				regionFromAttr = attr.Value
 			}
+			if attr.Name.Local == "begin" {
+				beginAttr = attr.Value
+			}
 		}
 		h.regionStack = append(h.regionStack, regionFromAttr)
+		if err := h.pushOffset(beginAttr, name.Local); err != nil {
+			return err
+		}
 	case "style":
 		h.currentStyle = &Style{}
 		for _, attr := range attrs {
@@ -275,6 +361,7 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 				}
 			}
 		}
+		h.currentCue.Offset = h.currentOffset()
 		logger.Debug("Starting p element", "id", h.currentCue.ID, "region", h.currentCue.RegionID)
 	case "span":
 		h.inSpanElement = true
@@ -291,6 +378,42 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 		}
 	}
 	return nil
+}
+
+func (h *ittHandler) pushOffset(beginAttr string, elementName string) error {
+	var parent *big.Rat
+	if len(h.offsetStack) > 0 && h.offsetStack[len(h.offsetStack)-1] != nil {
+		parent = new(big.Rat).Set(h.offsetStack[len(h.offsetStack)-1])
+	}
+
+	offset := parent
+	if beginAttr != "" {
+		if h.frameRate == nil {
+			return fmt.Errorf("frameRate attribute missing in <tt> tag")
+		}
+		tc, err := timecode.ParseSMPTETimecode(beginAttr)
+		if err != nil {
+			return fmt.Errorf("error parsing begin timecode '%s' on <%s>: %w", beginAttr, elementName, err)
+		}
+		ms, err := tc.ToMilliseconds(h.frameRate)
+		if err != nil {
+			return fmt.Errorf("error converting begin timecode '%s' on <%s>: %w", beginAttr, elementName, err)
+		}
+		if offset == nil {
+			offset = new(big.Rat)
+		}
+		offset.Add(offset, ms)
+	}
+
+	h.offsetStack = append(h.offsetStack, offset)
+	return nil
+}
+
+func (h *ittHandler) currentOffset() *big.Rat {
+	if len(h.offsetStack) == 0 || h.offsetStack[len(h.offsetStack)-1] == nil {
+		return nil
+	}
+	return new(big.Rat).Set(h.offsetStack[len(h.offsetStack)-1])
 }
 
 func (h *ittHandler) handleEndElement(name xml.Name) error {
@@ -324,6 +447,9 @@ func (h *ittHandler) handleEndElement(name xml.Name) error {
 	case "body", "div":
 		if len(h.regionStack) > 0 {
 			h.regionStack = h.regionStack[:len(h.regionStack)-1]
+		}
+		if len(h.offsetStack) > 0 {
+			h.offsetStack = h.offsetStack[:len(h.offsetStack)-1]
 		}
 	}
 	return nil

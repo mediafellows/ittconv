@@ -46,6 +46,7 @@ func NewFrameRate(s string) (*FrameRate, error) {
 
 // SMPTETimecode represents a timecode in HH:MM:SS:FF format.
 type SMPTETimecode struct {
+	Sign    int
 	Hours   int
 	Minutes int
 	Seconds int
@@ -57,6 +58,14 @@ func ParseSMPTETimecode(s string) (*SMPTETimecode, error) {
 	// Drop-frame timecodes often use ';' between seconds and frames.
 	// Normalize them to ':' so they can be parsed alongside standard SMPTE.
 	normalized := strings.ReplaceAll(s, ";", ":")
+	sign := 1
+	if strings.HasPrefix(normalized, "-") {
+		sign = -1
+		normalized = strings.TrimPrefix(normalized, "-")
+	} else {
+		normalized = strings.TrimPrefix(normalized, "+")
+	}
+
 	parts := strings.Split(normalized, ":")
 	if len(parts) != 4 {
 		return nil, fmt.Errorf("invalid SMPTE timecode format: %s, expected HH:MM:SS:FF", s)
@@ -84,6 +93,7 @@ func ParseSMPTETimecode(s string) (*SMPTETimecode, error) {
 	}
 
 	return &SMPTETimecode{
+		Sign:    sign,
 		Hours:   h,
 		Minutes: m,
 		Seconds: s2,
@@ -110,13 +120,24 @@ func (t *SMPTETimecode) ToMilliseconds(fr *FrameRate) (*big.Rat, error) {
 	// Convert total seconds to milliseconds: totalPreciseSeconds * 1000
 	milliseconds := new(big.Rat).Mul(totalPreciseSeconds, big.NewRat(1000, 1))
 
-	return milliseconds, nil
+	sign := t.Sign
+	if sign == 0 {
+		sign = 1
+	}
+
+	return new(big.Rat).Mul(milliseconds, big.NewRat(int64(sign), 1)), nil
 }
 
 // MillisecondsToSMPTETimecode converts milliseconds to SMPTETimecode using the given FrameRate.
 func MillisecondsToSMPTETimecode(ms *big.Rat, fr *FrameRate) (*SMPTETimecode, error) {
 	if ms == nil || fr == nil || fr.Num().Cmp(big.NewInt(0)) == 0 {
 		return nil, fmt.Errorf("invalid input: milliseconds or framerate cannot be nil or zero")
+	}
+
+	sign := 1
+	if ms.Sign() < 0 {
+		sign = -1
+		ms = new(big.Rat).Abs(ms)
 	}
 
 	// Convert milliseconds to total seconds as a rational number
@@ -140,6 +161,7 @@ func MillisecondsToSMPTETimecode(ms *big.Rat, fr *FrameRate) (*SMPTETimecode, er
 	frames := new(big.Int).Quo(roundedFramesRat.Num(), roundedFramesRat.Denom())
 
 	return &SMPTETimecode{
+		Sign:    sign,
 		Hours:   int(hours.Int64()),
 		Minutes: int(minutes.Int64()),
 		Seconds: int(seconds.Int64()),
@@ -152,6 +174,12 @@ func (t *SMPTETimecode) ToClockTime(fr *FrameRate, precision int) (string, error
 	ms, err := t.ToMilliseconds(fr)
 	if err != nil {
 		return "", err
+	}
+
+	sign := ""
+	if ms.Sign() < 0 {
+		sign = "-"
+		ms = new(big.Rat).Abs(ms)
 	}
 
 	// Convert milliseconds to total seconds
@@ -176,7 +204,8 @@ func (t *SMPTETimecode) ToClockTime(fr *FrameRate, precision int) (string, error
 	fracFormat := fmt.Sprintf("%%0%dd", precision)
 	fracStr := fmt.Sprintf(fracFormat, roundedFractionalMillis.Int64())
 
-	return fmt.Sprintf("%02d:%02d:%02d.%s",
+	return fmt.Sprintf("%s%02d:%02d:%02d.%s",
+		sign,
 		int(secInt.Int64()/3600),
 		int((secInt.Int64()%3600)/60),
 		int(secInt.Int64()%60),

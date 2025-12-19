@@ -2,6 +2,7 @@ package parser
 
 import (
 	"io/ioutil"
+	"math/big"
 	"strings"
 	"testing"
 
@@ -82,5 +83,48 @@ func TestParseITT_InvalidTimeRange(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "is not less than end time") {
 		t.Errorf("Expected error message about invalid time range, but got: %v", err)
+	}
+}
+
+func TestParseITT_DivBeginOffset(t *testing.T) {
+	ittSource, err := ioutil.ReadFile("../../testdata/shifted.itt")
+	if err != nil {
+		t.Fatalf("Failed to read test fixture: %v", err)
+	}
+
+	doc, err := ParseITT(string(ittSource))
+	if err != nil {
+		t.Fatalf("ParseITT failed: %v", err)
+	}
+
+	if doc.FrameRateMultiplierNum != 999 || doc.FrameRateMultiplierDen != 1000 {
+		t.Fatalf("Expected frameRateMultiplier 999/1000, got %d/%d", doc.FrameRateMultiplierNum, doc.FrameRateMultiplierDen)
+	}
+	if len(doc.Cues) != 5 {
+		t.Fatalf("Expected 5 cues, got %d", len(doc.Cues))
+	}
+
+	fr, _ := timecode.NewFrameRate("24")
+	fr.Rat.Mul(fr.Rat, big.NewRat(999, 1000))
+
+	shiftTc, _ := timecode.ParseSMPTETimecode("-00:59:59:00")
+	shiftMs, _ := shiftTc.ToMilliseconds(fr)
+
+	firstBeginTC, _ := timecode.ParseSMPTETimecode("01:05:27:21")
+	firstBeginMs, _ := firstBeginTC.ToMilliseconds(fr)
+	firstBeginMs.Add(firstBeginMs, shiftMs)
+
+	firstCue := doc.Cues[0]
+	if firstCue.Begin.Cmp(firstBeginMs) != 0 {
+		t.Fatalf("Expected first cue begin %s, got %s", firstBeginMs.String(), firstCue.Begin.String())
+	}
+
+	lastBeginTC, _ := timecode.ParseSMPTETimecode("01:09:33:22")
+	lastBeginMs, _ := lastBeginTC.ToMilliseconds(fr)
+	lastBeginMs.Add(lastBeginMs, shiftMs)
+
+	lastCue := doc.Cues[len(doc.Cues)-1]
+	if lastCue.Begin.Cmp(lastBeginMs) != 0 {
+		t.Fatalf("Expected last cue begin %s, got %s", lastBeginMs.String(), lastCue.Begin.String())
 	}
 }

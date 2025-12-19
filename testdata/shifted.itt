@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Subtitles file created by EZConvert version 6.2.27-->
+<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tt="http://www.w3.org/ns/ttml" xml:lang="en" ttp:frameRate="24" ttp:frameRateMultiplier="999 1000" ttp:dropMode="nonDrop" ttp:timeBase="smpte">
+  <head>
+    <styling>
+      <style xml:id="style.default" tts:fontFamily="sansSerif" tts:fontSize="100%" tts:fontStyle="normal" tts:fontWeight="normal" tts:color="white"/>
+      <style xml:id="style.D1AD2C" tts:fontFamily="sansSerif" tts:fontSize="100%" tts:fontStyle="normal" tts:fontWeight="normal" tts:color="#D1AD2C"/>
+      <style xml:id="style.D1AD2C.italic" tts:fontFamily="sansSerif" tts:fontSize="100%" tts:fontStyle="italic" tts:fontWeight="normal" tts:color="#D1AD2C"/>
+    </styling>
+    <layout>
+      <region xml:id="top" tts:displayAlign="before" tts:origin="0% 0%" tts:extent="100% 15%" tts:textAlign="center"/>
+      <region xml:id="bottom" tts:displayAlign="after" tts:origin="0% 85%" tts:extent="100% 15%" tts:textAlign="center"/>
+    </layout>
+  </head>
+  <body region="bottom" style="style.default">
+    <div begin="-00:59:59:00">
+      <p begin="01:05:27:21" end="01:05:29:20">
+        <span style="style.D1AD2C">This is an example:</span>
+      </p>
+      <p begin="01:05:29:22" end="01:05:32:15">
+        <span style="style.D1AD2C">That shows shifted timestamps</span>
+        <br/>
+        <span style="style.D1AD2C">during conversion</span>
+      </p>
+      <p begin="01:05:32:17" end="01:05:35:09">
+        <span style="style.D1AD2C">London is a big</span>
+        <br/>
+        <span style="style.D1AD2C">capital</span>
+      </p>
+      <p begin="01:09:04:11" end="01:09:07:21">
+        <span style="style.D1AD2C">of Great Britain</span>
+      </p>
+      <p begin="01:09:33:22" end="01:09:36:10">
+        <span style="style.D1AD2C.italic">Ok</span>
+      </p>
+    </div>
+  </body>
+</tt>
