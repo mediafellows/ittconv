@@ -1,12 +1,9 @@
 package ittconv
 
 import (
-	"bytes"
 	"io/ioutil"
 	"strings"
 	"testing"
-
-	"github.com/asticode/go-astisub"
 )
 
 func TestToVTT(t *testing.T) {
@@ -23,7 +20,7 @@ func TestToVTT(t *testing.T) {
 	}
 
 	// Basic checks for VTT content
-	if !strings.HasPrefix(vttOutput, "WEBVTT") {
+	if !strings.HasPrefix(strings.TrimPrefix(vttOutput, "\ufeff"), "WEBVTT") {
 		t.Error("Expected VTT output to start with WEBVTT")
 	}
 	if !strings.Contains(vttOutput, "-->") {
@@ -128,18 +125,11 @@ func TestConversionChainFixtures(t *testing.T) {
 				}
 			}
 
-			subs, err := astisub.ReadFromTTML(strings.NewReader(ttmlOutput))
+			vttOutput, err := ToVTT(string(ittSource))
 			if err != nil {
-				t.Fatalf("go-astisub failed to parse TTML output for %s: %v", tc.path, err)
+				t.Fatalf("ToVTT failed for %s: %v", tc.path, err)
 			}
-
-			var buf bytes.Buffer
-			if err := subs.WriteToWebVTT(&buf); err != nil {
-				t.Fatalf("go-astisub failed to convert TTML to WebVTT for %s: %v", tc.path, err)
-			}
-
-			vttOutput := buf.String()
-			if !strings.HasPrefix(vttOutput, "WEBVTT") {
+			if !strings.HasPrefix(strings.TrimPrefix(vttOutput, "\ufeff"), "WEBVTT") {
 				t.Fatalf("Converted WebVTT output for %s does not start with WEBVTT header", tc.path)
 			}
 			if !strings.Contains(vttOutput, "-->") {

@@ -1,16 +1,10 @@
-WEBVTT
+﻿WEBVTT
 
-Region: id=bottom lines=2 regionanchor=0%,0% scroll=up viewportanchor=15%,80% width=70%
-Region: id=top lines=2 regionanchor=0%,0% scroll=up viewportanchor=15%,10% width=70%
-
-1
-00:00:00.333 --> 00:00:02.667 region:top
+00:00:00.334 --> 00:00:02.667 align:center line:0
 ¡Hola!
 
-2
-00:00:03.000 --> 00:00:05.000 region:top
+00:00:03.000 --> 00:00:05.000 align:center line:0
 ¿Cómo estás?
 
-3
-00:00:05.333 --> 00:00:07.500 region:bottom
+00:00:05.334 --> 00:00:07.501 align:center line:-1
 Estoy bien, gracias.

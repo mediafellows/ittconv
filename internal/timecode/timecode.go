@@ -10,6 +10,7 @@ import (
 // FrameRate represents a video frame rate as a rational number for precision.
 type FrameRate struct {
 	*big.Rat
+	Nominal *big.Rat
 }
 
 // NewFrameRate creates a new FrameRate from a string (e.g., "24", "23.976", "29.97").
@@ -41,7 +42,28 @@ func NewFrameRate(s string) (*FrameRate, error) {
 			return nil, fmt.Errorf("invalid framerate format: %s", s)
 		}
 	}
-	return &FrameRate{r}, nil
+	return &FrameRate{
+		Rat:     r,
+		Nominal: new(big.Rat).Set(r),
+	}, nil
+}
+
+// WithMultiplier returns a frame rate with the same nominal label rate and a
+// multiplied effective playback rate.
+func (fr *FrameRate) WithMultiplier(num, den int) *FrameRate {
+	if fr == nil {
+		return nil
+	}
+
+	nominal := fr.Nominal
+	if nominal == nil {
+		nominal = fr.Rat
+	}
+
+	return &FrameRate{
+		Rat:     new(big.Rat).Mul(fr.Rat, big.NewRat(int64(num), int64(den))),
+		Nominal: new(big.Rat).Set(nominal),
+	}
 }
 
 // SMPTETimecode represents a timecode in HH:MM:SS:FF format.
@@ -107,15 +129,19 @@ func (t *SMPTETimecode) ToMilliseconds(fr *FrameRate) (*big.Rat, error) {
 		return nil, fmt.Errorf("invalid framerate: cannot be nil or zero")
 	}
 
-	// Total seconds from HH:MM:SS
+	nominal := fr.Nominal
+	if nominal == nil {
+		nominal = fr.Rat
+	}
+
+	// SMPTE labels count HH:MM:SS at the nominal frame rate. The effective
+	// frame rate, after ttp:frameRateMultiplier, converts those labels to media
+	// time.
 	totalSeconds := big.NewRat(int64(t.Hours*3600+t.Minutes*60+t.Seconds), 1)
-	framesAsRat := big.NewRat(int64(t.Frames), 1)
+	framesFromClock := new(big.Rat).Mul(totalSeconds, nominal)
+	totalFrames := new(big.Rat).Add(framesFromClock, big.NewRat(int64(t.Frames), 1))
 
-	// Convert frames to seconds: frames / framerate
-	secondsFromFrames := new(big.Rat).Quo(framesAsRat, fr.Rat)
-
-	// Total seconds
-	totalPreciseSeconds := new(big.Rat).Add(totalSeconds, secondsFromFrames)
+	totalPreciseSeconds := new(big.Rat).Quo(totalFrames, fr.Rat)
 
 	// Convert total seconds to milliseconds: totalPreciseSeconds * 1000
 	milliseconds := new(big.Rat).Mul(totalPreciseSeconds, big.NewRat(1000, 1))

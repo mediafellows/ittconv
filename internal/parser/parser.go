@@ -91,9 +91,7 @@ func ParseITT(ittSource string) (*ITTDocument, error) {
 		}
 		if doc.FrameRateMultiplierNum > 0 && doc.FrameRateMultiplierDen > 0 {
 			if baseFrameRate.IsInt() {
-				baseFrameRate = &timecode.FrameRate{
-					Rat: new(big.Rat).Mul(baseFrameRate.Rat, big.NewRat(int64(doc.FrameRateMultiplierNum), int64(doc.FrameRateMultiplierDen))),
-				}
+				baseFrameRate = baseFrameRate.WithMultiplier(doc.FrameRateMultiplierNum, doc.FrameRateMultiplierDen)
 			} else {
 				logger.Debug("Skipping frameRateMultiplier because base frameRate is non-integer", "frameRate", doc.FrameRate)
 			}
@@ -237,9 +235,7 @@ func (h *ittHandler) handleStartElement(name xml.Name, attrs []xml.Attr) error {
 			}
 			if h.doc.FrameRateMultiplierNum > 0 && h.doc.FrameRateMultiplierDen > 0 {
 				if fr.IsInt() {
-					fr = &timecode.FrameRate{
-						Rat: new(big.Rat).Mul(fr.Rat, big.NewRat(int64(h.doc.FrameRateMultiplierNum), int64(h.doc.FrameRateMultiplierDen))),
-					}
+					fr = fr.WithMultiplier(h.doc.FrameRateMultiplierNum, h.doc.FrameRateMultiplierDen)
 				} else {
 					logger.Debug("Skipping frameRateMultiplier because base frameRate is non-integer", "frameRate", h.doc.FrameRate)
 				}

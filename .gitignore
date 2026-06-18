@@ -1,3 +1,5 @@
 tmp/*
-./ittconv
+/ittconv
 .cache/*
+dist/
+scripts/*

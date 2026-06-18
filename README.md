@@ -16,12 +16,12 @@ This Go module provides functionality to convert iTunes Timed Text (.itt) subtit
 
 ## Features
 
-- Conversion of .itt to TTML and WebVTT.
-- Precise timecode conversions using rational numbers.
+- Conversion of .itt to TTML and reference-compatible WebVTT.
+- Precise SMPTE timecode conversion using rational numbers.
 - Efficient XML parsing with SAX.
-- Configurable frame rates, precision, and TTML profiles.
+- Preservation of line breaks, cue placement, color classes, and italics in WebVTT.
 - Structured logging.
-- Comprehensive unit, property, mutation, and integration tests.
+- Unit tests and golden subtitle fixtures.
 - User-friendly CLI.
 
 ## Installation
@@ -47,40 +47,15 @@ This will create an executable named `ittconv` in your current directory.
 
 ### CLI Application
 
-The `ittconv` CLI tool allows you to convert .itt files with various options.
-
-**Basic Conversion to TTML:**
+The `ittconv` CLI reads one `.itt` file and writes WebVTT by default.
 
 ```bash
-./ittconv --input <input.itt> --output <output.ttml> --framerate <frame_rate>
+./ittconv input.itt
+./ittconv input.itt -o output.vtt
+./ittconv input.itt -f ttml -o output.ttml
 ```
 
-Example:
-
-```bash
-./ittconv --input input.itt --output output.ttml --framerate 24
-```
-
-**Conversion to WebVTT:**
-
-Use the `--vtt` flag to convert to WebVTT format.
-
-```bash
-./ittconv --input <input.itt> --vtt --output <output.vtt> --framerate <frame_rate>
-```
-
-Example:
-
-```bash
-./ittconv --input input.itt --vtt --output output.vtt --framerate 23.976
-```
-
-**Optional Flags:**
-
-- `--profile <profile>`: Specify the TTML profile (e.g., `imsc1`).
-- `--precision <decimal_places>`: Set the decimal places for time precision.
-- `--log-level <level>`: Configure the logging level (debug, info, warn, error).
-- `--version`: Display the application version.
+Use `go run ./cmd/ittconv --help` to inspect the current flags.
 
 **Batch Processing:**
 
@@ -127,13 +102,15 @@ To run the tests for the module:
 go test ./...
 ```
 
+The same command is available through `make test` or `just test`.
+
 To check test coverage:
 
 ```bash
 go test ./... -cover
 ```
 
-Unit, property, mutation, and integration tests are included to ensure robustness and correctness.
+The `integration-test` automation target is a stub until integration tests are explicitly requested.
 
 ## Project Structure
 
@@ -143,7 +120,7 @@ The project is organized into the following main directories:
 - `internal/parser`: Handles .itt XML parsing.
 - `internal/timecode`: Manages timecode conversions.
 - `internal/ttml`: Implements .itt to TTML conversion logic.
-- `internal/vtt`: Provides TTML to WebVTT conversion functionality.
+- `internal/vtt`: Provides direct ITT model to WebVTT conversion functionality.
 - `docs`: Documentation files, including conversion guides and checklists.
 - `testdata`: Sample .itt, TTML, and WebVTT files for testing, along with golden files for expected outputs.
 

@@ -94,6 +94,7 @@ func TestToMilliseconds(t *testing.T) {
 	fr2997, _ := NewFrameRate("29.97")
 	fr25, _ := NewFrameRate("25")
 	fr30, _ := NewFrameRate("30")
+	fr23976 := fr24.WithMultiplier(999, 1000)
 
 	tests := []struct {
 		name      string
@@ -107,11 +108,12 @@ func TestToMilliseconds(t *testing.T) {
 		{name: "00:00:00:12 @ 24fps", timecode: tc(0, 0, 0, 12), framerate: fr24, expected: big.NewRat(500, 1), expectErr: false},
 		{name: "00:00:01:12 @ 24fps", timecode: tc(0, 0, 1, 12), framerate: fr24, expected: big.NewRat(1500, 1), expectErr: false},
 		{name: "00:00:00:29 @ 29.97fps", timecode: tc(0, 0, 0, 29), framerate: fr2997, expected: big.NewRat(2900000, 2997), expectErr: false},
+		{name: "01:00:00:00 @ 23.976 effective SMPTE", timecode: tc(1, 0, 0, 0), framerate: fr23976, expected: big.NewRat(3600000000, 999), expectErr: false},
 		{name: "00:00:01:00 @ 25fps", timecode: tc(0, 0, 1, 0), framerate: fr25, expected: big.NewRat(1000, 1), expectErr: false},
 		{name: "00:00:00:15 @ 30fps", timecode: tc(0, 0, 0, 15), framerate: fr30, expected: big.NewRat(500, 1), expectErr: false},
 		{name: "Negative timecode", timecode: tcSigned(-1, 0, 0, 1, 0), framerate: fr24, expected: big.NewRat(-1000, 1), expectErr: false},
 		{name: "Nil FrameRate", timecode: tc(0, 0, 0, 0), framerate: nil, expected: nil, expectErr: true},
-		{name: "Zero FrameRate", timecode: tc(0, 0, 0, 0), framerate: &FrameRate{big.NewRat(0, 1)}, expected: nil, expectErr: true},
+		{name: "Zero FrameRate", timecode: tc(0, 0, 0, 0), framerate: &FrameRate{Rat: big.NewRat(0, 1)}, expected: nil, expectErr: true},
 	}
 
 	for _, tt := range tests {
@@ -155,7 +157,7 @@ func TestMillisecondsToSMPTETimecode(t *testing.T) {
 		{name: "Negative milliseconds", ms: big.NewRat(-1000, 1), framerate: fr24, expected: tcSigned(-1, 0, 0, 1, 0), expectErr: false},
 		{name: "Nil Milliseconds", ms: nil, framerate: fr24, expected: nil, expectErr: true},
 		{name: "Nil FrameRate", ms: big.NewRat(0, 1), framerate: nil, expected: nil, expectErr: true},
-		{name: "Zero FrameRate", ms: big.NewRat(0, 1), framerate: &FrameRate{big.NewRat(0, 1)}, expected: nil, expectErr: true},
+		{name: "Zero FrameRate", ms: big.NewRat(0, 1), framerate: &FrameRate{Rat: big.NewRat(0, 1)}, expected: nil, expectErr: true},
 	}
 
 	for _, tt := range tests {

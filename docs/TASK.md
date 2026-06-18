@@ -28,7 +28,7 @@ Create a README.md with setup, usage, and testing instructions.
 
 Dependencies:
 github.com/orisano/gosax for SAX-based XML parsing.
-github.com/asticode/go-astisub for TTML to WebVTT conversion.
+Use the direct writer in internal/vtt for WebVTT conversion.
 github.com/alecthomas/kong for CLI argument parsing.
 math/big for rational number calculations.
 go.uber.org/zap for structured logging.
@@ -63,7 +63,7 @@ func ConvertToVTT(ittSource, framerate string) (string, error)
 
 Input: Same as ConvertToTTML.
 Output: WebVTT content as a string or an error.
-Behavior: Convert .itt to TTML, then use github.com/asticode/go-astisub to produce WebVTT, ensuring valid output.
+Behavior: Convert parsed .itt cues directly to WebVTT, ensuring valid output.
 
 
 
@@ -94,7 +94,7 @@ Support configurable TTML profiles (e.g., IMSC1).
 
 WebVTT Conversion:
 
-Use github.com/asticode/go-astisub to convert TTML to WebVTT.
+Use the direct writer in internal/vtt to convert parsed cues to WebVTT.
 Ensure proper WebVTT cues, timestamps, and styling.
 Address WebVTT limitations (e.g., limited styling support).
 
@@ -267,7 +267,7 @@ Implementation:
 Parser: Use github.com/orisano/gosax to parse .itt XML into a structured model.
 Timecode Conversion: Implement precise conversions with math/big.Rat.
 TTML Conversion: Build TTML output per docs/itt_to_ttml_conversion_guide.md.
-WebVTT Conversion: Chain TTML to WebVTT using github.com/asticode/go-astisub.
+WebVTT Conversion: Render parsed cues directly with internal/vtt.
 CLI: Use github.com/alecthomas/kong for argument parsing and config.
 Logging: Integrate go.uber.org/zap for structured logs.
 
